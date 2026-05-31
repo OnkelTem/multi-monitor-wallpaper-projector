@@ -1,0 +1,9 @@
+/*.jpg
+/*.jpeg
+/*.png
+/__pycache__/
+/.venv/
+/wallpapers/
+/dev/
+config.json
+scene.json
