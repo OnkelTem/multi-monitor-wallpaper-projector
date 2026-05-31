@@ -112,6 +112,43 @@ def get_output_path(project_dir, configured_output):
 
 
 # ----------------------------
+# flat mode helpers
+# ----------------------------
+def get_monitor_position(obj_name):
+    name_lower = obj_name.lower()
+    if "left" in name_lower:
+        return "left"
+    elif "right" in name_lower:
+        return "right"
+    else:
+        return "center"
+
+
+def render_monitor_flat(panorama_img, dst_size, position):
+    width, height = dst_size
+    target_aspect = width / height
+    pano_h, pano_w = panorama_img.shape[:2]
+
+    if pano_w / pano_h > target_aspect:
+        crop_h = pano_h
+        crop_w = int(crop_h * target_aspect)
+    else:
+        crop_w = pano_w
+        crop_h = int(crop_w / target_aspect)
+
+    if position == 'left':
+        x = 0
+    elif position == 'right':
+        x = pano_w - crop_w
+    else:
+        x = (pano_w - crop_w) // 2
+
+    y = (pano_h - crop_h) // 2
+    cropped = panorama_img[y:y + crop_h, x:x + crop_w]
+    return cv2.resize(cropped, (width, height), interpolation=cv2.INTER_LANCZOS4)
+
+
+# ----------------------------
 # main
 # ----------------------------
 def main():
@@ -127,6 +164,11 @@ def main():
         "--config",
         default="config.json",
         help="Path to config.json (default: ./config.json)",
+    )
+    parser.add_argument(
+        "--flat",
+        action="store_true",
+        help="Generate flat crops without 3D projection",
     )
     parser.add_argument(
         "project_dir",
@@ -187,19 +229,27 @@ def main():
 
     for obj_name, out_cfg in config["outputs"].items():
 
-        if obj_name not in objects:
-            print(f"Error: Object '{obj_name}' not found in scene.json", file=sys.stderr)
-            sys.exit(1)
+        if args.flat:
+            position = get_monitor_position(obj_name)
+            result = render_monitor_flat(
+                img,
+                (out_cfg["width"], out_cfg["height"]),
+                position,
+            )
+        else:
+            if obj_name not in objects:
+                print(f"Error: Object '{obj_name}' not found in scene.json", file=sys.stderr)
+                sys.exit(1)
 
-        monitor_quad = vertices_to_quad(objects[obj_name]["vertices"])
+            monitor_quad = vertices_to_quad(objects[obj_name]["vertices"])
 
-        result = render_monitor(
-            img,
-            pano_quad,
-            monitor_quad,
-            camera_pos,
-            (out_cfg["width"], out_cfg["height"]),
-        )
+            result = render_monitor(
+                img,
+                pano_quad,
+                monitor_quad,
+                camera_pos,
+                (out_cfg["width"], out_cfg["height"]),
+            )
 
         output_path = get_output_path(args.project_dir, out_cfg["output"])
         cv2.imwrite(output_path, result, [cv2.IMWRITE_JPEG_QUALITY, 95])

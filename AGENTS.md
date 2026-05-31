@@ -43,6 +43,7 @@ crop.py ←── scene.json                  │
 - output_dir = source file name (not `dist/`)
 - tkinter instead of OpenCV because OpenCV's GTK backend does not handle WM_DELETE_WINDOW correctly
 - `apply-kde-wallpapers.py` is a flat CLI, no subparsers
+- `--flat` bypasses 3D projection, crops panorama directly to each monitor's aspect ratio
 
 ### Common errors
 

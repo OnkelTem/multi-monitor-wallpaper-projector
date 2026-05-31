@@ -1,6 +1,41 @@
 # Multi-monitor wallpaper projector
 
-Generate wallpapers for a multi-monitor setup from a Blender scene. Currently multi = precisely 3 :)
+Generates wallpapers for a multi-monitor<sup>*</sup> setup using a Blender scene.
+
+<sup>*</sup> <small>Currently multi = 3 precisely</small>
+
+## Demo
+
+In a three monitors setup if you try to span a panoramic wallpaper across them, you may get:
+
+**Regular wallpaper span**
+
+![city-1](docs/images/city-1.jpg)
+
+As you can see, the shoreline is curved as if it had a trapezoidal shape (or a zigzag as in my case due to
+different resolutions), as if it were some kind of bay - even though in reality the shoreline is straight.
+
+Here is a fixed view:
+
+**Properly projected**
+
+![city-2](docs/images/city-2.jpg)
+
+**Comparison**
+
+![compare](docs/images/compare.jpg)
+
+The first view ignores the fact that the side monitors are not coplanar with the
+central monitor - instead, they are set at an angle to it.
+
+So we should take into account the specific angles of the displays and correctly project the side images.
+
+Here is what it looks like in blender for my setup:
+
+![Blender scene](docs/images/blender.jpg)
+
+This model has three monitor planes and a panorama plane used by this repo to setup the scene
+for projections.
 
 ## Setup
 
@@ -28,7 +63,7 @@ python3 apply-kde-wallpapers.py wallpapers/panorama/
 |--------|-------------|
 | `init-config.py` | Generate `config.json` from `scene.json` + xrandr |
 | `crop.py [--scene] [--dir] <image>` | Interactive cropper (tkinter), saves `crop.json` + `source.jpg` |
-| `wallpaper.py [--scene] [--config] <project_dir>/` | Generate wallpapers for three monitors |
+| `wallpaper.py [--scene] [--config] [--flat] <project_dir>/` | Generate wallpapers for three monitors |
 | `apply-kde-wallpapers.py [--config] [--dry-run] <directory>` | Apply wallpapers via KDE Scripting API |
 
 ## Configuration
